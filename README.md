@@ -2,6 +2,8 @@
 
 The GPT-based Universal Web Scraper is an MVP project that aims to provide a web scraping solution using GPT models to interact with users and generate scraper code based on user requirements, website structure analysis, and network traffic analysis. The purpose of this project is to simplify the process of web scraping by leveraging the capabilities of GPT models and various web scraping libraries.
 
+**Note**: The GPT prompt for analyzing API calls is still in progress and may not return accurate results at this time. We are working on improving the prompt to provide better analysis results.
+
 ## Documentation
 
 Detailed information about the project can be found in the following documents:
@@ -25,9 +27,60 @@ To install the project dependencies, run the following command:
 pip install -r requirements.txt
 ```
 
+Next, copy the `config.json.example` file to `config.json` and enter your GPT-4 API key in the `gpt4` section:
+
+```json
+{
+  "gpt4": {
+    "api_key": "your-api-key-here"
+  }
+}
+```
+
 ## Usage
 
-Currently the project is still under development. This section will be updated once the project is ready for use.
+You can analyze the network traffic of websites using the NetworkAnalyzer class provided in the `./website_analysis/network_analysis.py` file. Here's an example of how to use the class:
+
+```python
+
+from website_analysis.network_analysis import NetworkAnalyzer
+
+# URL of the website to analyze
+url = "https://www.example.com"
+
+# User requirements for the data extraction (currently not used)
+user_requirements = {}
+
+# Create a NetworkAnalyzer instance
+analyzer = NetworkAnalyzer(url, user_requirements)
+
+# Analyze the website
+analysis_results = analyzer.analyze_website()
+
+# Print the analysis results
+print(analysis_results)
+```
+
+You can also analyze multiple websites at once using the `analyze_websites` function provided in the same file. Just pass a list of website URLs as an argument:
+
+```python
+
+from website_analysis.network_analysis import analyze_websites
+
+# List of website URLs to analyze
+websites = [
+    "https://www.example1.com",
+    "https://www.example2.com",
+    "https://www.example3.com"
+]
+
+# Analyze the websites
+results = analyze_websites(websites)
+
+# Print the analysis results
+print(results)
+```
+
 
 ## Testing
 

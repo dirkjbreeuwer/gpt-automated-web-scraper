@@ -1,16 +1,29 @@
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import json
-import re
-import pdb
+import openai
+
+
+# Load the API key from the config file
+def load_config():
+    with open("config.json", "r") as config_file:
+        config_data = json.load(config_file)
+    return config_data
+
+config = load_config()
+gpt4_api_key = config["gpt4"]["api_key"]
+
 
 class NetworkAnalyzer:
-    def __init__(self, url, user_requirements, captured_traffic=None):
+    def __init__(self, url, user_requirements, captured_traffic=None, open_api_key=None):
         self.url = url
         self.user_requirements = user_requirements
         self.captured_traffic = captured_traffic
         self.api_calls = []
         self.analysis_results = {}
+        self.open_api_key = open_api_key
+        if open_api_key:
+            openai.api_key = open_api_key
 
     def capture_network_traffic(self):
         if not self.captured_traffic:
@@ -23,9 +36,9 @@ class NetworkAnalyzer:
             # Enable headless mode (optional)
             chrome_options.add_argument('--headless')
             # Disable images (optional, for faster browsing)
-            #chrome_options.add_argument('--blink-settings=imagesEnabled=false')
+            chrome_options.add_argument('--blink-settings=imagesEnabled=false')
             # Disable GPU (optional, may improve stability)
-            #chrome_options.add_argument('--disable-gpu')
+            chrome_options.add_argument('--disable-gpu')
 
             # Initialize the browser with the specified capabilities and options
             browser = webdriver.Chrome(desired_capabilities=desired_capabilities, options=chrome_options)
@@ -43,10 +56,8 @@ class NetworkAnalyzer:
             self.captured_traffic = [json.loads(log['message'])['message'] for log in logs]
 
             # Save the captured traffic to a JSON file
-
             with open('captured_traffic.json', 'w') as f:
                 json.dump(self.captured_traffic, f)
-
 
             # Close the browser
             browser.quit()
@@ -95,8 +106,34 @@ class NetworkAnalyzer:
 
 
     def analyze_api_calls(self):
-        # Return the list of identified API calls
-        return self.api_calls
+        # Prepare the API calls data for input to GPT-3
+        api_calls_data = json.dumps(self.api_calls, indent=2)
+
+        # Construct the GPT-3 prompt
+        prompt = (
+            f"We are trying to identify a website's internal API. Here are all XML and JSON results we found when navigating this website:\n\n"
+            f"{api_calls_data}\n\n"
+            f"Can you parse the websites XML and JSON results into the following format: \n\n"
+            f"| URL | Referer | Method | Purpose |\n"
+        )
+
+        #print(prompt)
+
+        # Call the GPT-3 API
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=4000,
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+
+        # Extract the API analysis results from the GPT-3 response
+        api_analysis_results = response.choices[0].text.strip()
+
+        return api_analysis_results
+
 
     def filter_api_calls(self):
         # Placeholder for filtering API calls based on user requirements
@@ -105,13 +142,14 @@ class NetworkAnalyzer:
     def get_analysis_results(self):
         # Call analyze_api_calls and return the results
         return self.analyze_api_calls()
+    
+    def analyze_website(self):
+        self.capture_network_traffic()
+        self.identify_api_calls()
+        api_analysis_results = self.analyze_api_calls()
+        return api_analysis_results
 
-def main(url):
-    user_requirements = {}
-    analyzer = NetworkAnalyzer(url, user_requirements)
-    analyzer.capture_network_traffic()
-    analyzer.identify_api_calls()
-    return analyzer.get_analysis_results()
+
 
 
 def analyze_websites(websites):
@@ -119,7 +157,8 @@ def analyze_websites(websites):
     for url in websites:
         try:
             print(f"Analyzing {url}...")
-            analysis_results = main(url)
+            analyzer = NetworkAnalyzer(url, {}, open_api_key=gpt4_api_key)
+            analysis_results = analyzer.analyze_website()
             results[url] = analysis_results
             print(f"Analysis results for {url}: {analysis_results}")
         except Exception as e:
