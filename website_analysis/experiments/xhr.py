@@ -1,3 +1,5 @@
+"""xhr.py: A script to monitor and capture XMLHttpRequest and Fetch API requests."""
+
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -6,6 +8,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def scroll(driver, max_scroll_cycles=10, max_allowed_time=60, sleep_time=3):
+    """
+    Scroll down a web page to capture any API requests triggered by scrolling.
+
+    :param driver: The WebDriver instance controlling the browser
+    :param max_scroll_cycles: Maximum number of scroll cycles to perform
+    :param max_allowed_time: Maximum allowed time in seconds for scrolling
+    :param sleep_time: Time in seconds to wait between scroll actions
+    """
     start_time = time.time()
     scroll_cycle = 0
 
@@ -44,6 +54,11 @@ driver.get("https://ra.co/events/uk/london?page=2")
 
 
 def monitor_requests(driver):
+    """
+    Attach listeners to XMLHttpRequest and Fetch API to capture API requests.
+
+    :param driver: The WebDriver instance controlling the browser
+    """
     driver.execute_script("""
         window.api_endpoints = new Set();
 

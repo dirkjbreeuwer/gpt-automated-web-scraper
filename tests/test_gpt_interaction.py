@@ -1,8 +1,8 @@
+"""test_gpt_interaction.py: A script to test the GPTInteraction class."""
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from gpt_interaction.gpt_interaction import GPTInteraction
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 if __name__ == "__main__":
     gpt = GPTInteraction()

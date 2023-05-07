@@ -1,11 +1,20 @@
+"""network_analysis.py: A script to identify API calls using Selenium and GPT-4.
+
+The analysis results are presented in a tabular format.
+"""
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import json
 import openai
 
 
-# Load the API key from the config file
 def load_config():
+    """
+    Load the API key from the configuration file.
+
+    :return: A dictionary containing the configuration data
+    """
     with open("config.json", "r") as config_file:
         config_data = json.load(config_file)
     return config_data
@@ -16,7 +25,21 @@ gpt4_api_key = config["gpt4"]["api_key"]
 
 
 class NetworkAnalyzer:
+    """NetworkAnalyzer: A class for analyzing network traffic.
+
+    Identifies API calls, processes them using GPT
+    and the analysis results are presented in a tabular format.
+    """
+
     def __init__(self, url, user_requirements, captured_traffic=None, open_api_key=None):
+        """
+        Initialize the NetworkAnalyzer class.
+
+        :param url: The target website URL
+        :param user_requirements: A dictionary containing user requirements (unused)
+        :param captured_traffic: A list of captured network traffic (optional)
+        :param open_api_key: The GPT-4 API key
+        """
         self.url = url
         self.user_requirements = user_requirements
         self.captured_traffic = captured_traffic
@@ -27,6 +50,7 @@ class NetworkAnalyzer:
             openai.api_key = open_api_key
 
     def capture_network_traffic(self):
+        """Capture network traffic using Selenium and save the logs to a JSON file."""
         if not self.captured_traffic:
             # Set up Selenium with desired capabilities to capture network traffic
             desired_capabilities = DesiredCapabilities.CHROME
@@ -42,7 +66,8 @@ class NetworkAnalyzer:
             chrome_options.add_argument('--disable-gpu')
 
             # Initialize the browser with the specified capabilities and options
-            browser = webdriver.Chrome(desired_capabilities=desired_capabilities, options=chrome_options)
+            browser = webdriver.Chrome(desired_capabilities=desired_capabilities,
+                                       options=chrome_options)
 
             # Browse the target URL
             browser.get(self.url)
@@ -68,6 +93,7 @@ class NetworkAnalyzer:
             raise Exception("Network traffic capturing failed.")
 
     def identify_api_calls(self):
+        """Identify API calls in the captured network traffic."""
         identified_api_calls = []
 
         for entry in self.captured_traffic:
@@ -80,7 +106,8 @@ class NetworkAnalyzer:
                 content_type = request['headers'].get('Content-Type', '')
 
                 # Check if the request is an AJAX request
-                if request_method in ['GET', 'POST'] and ('application/json' in content_type or 'application/xml' in content_type):
+                if request_method in ['GET', 'POST'] and ('application/json' in content_type
+                                                          or 'application/xml' in content_type):
                     api_call = {
                         'url': request_url,
                         'request': request
@@ -103,12 +130,18 @@ class NetworkAnalyzer:
         return "json" in content_type or "xml" in content_type
 
     def analyze_api_calls(self):
+        """
+        Analyze API calls using GPT-4 and return the analysis results.
+
+        :return: The API analysis results
+        """
         # Prepare the API calls data for input to GPT-3
         api_calls_data = json.dumps(self.api_calls, indent=2)
 
         # Construct the GPT-3 prompt
         prompt = (
-            f"We are trying to identify a website's internal API. Here are all XML and JSON results we found when navigating this website:\n\n"
+            f"We are trying to identify a website's internal API.\n\n"
+            f"Here are all XML and JSON results we found when navigating this website:\n\n"
             f"{api_calls_data}\n\n"
             f"Can you parse the websites XML and JSON results into the following format: \n\n"
             f"| URL | Referer | Method | Purpose |\n"
@@ -130,14 +163,24 @@ class NetworkAnalyzer:
         return api_analysis_results
 
     def filter_api_calls(self):
+        """Filter the API calls based on user requirements."""
         # Placeholder for filtering API calls based on user requirements
-        pass
+        return "Module not implemented."
 
     def get_analysis_results(self):
-        # Call analyze_api_calls and return the results
+        """
+        Get the API analysis results by calling analyze_api_calls.
+
+        :return: The API analysis results
+        """
         return self.analyze_api_calls()
 
     def analyze_website(self):
+        """
+        Analyze the target website.
+
+        :return: The API analysis results
+        """
         self.capture_network_traffic()
         self.identify_api_calls()
         api_analysis_results = self.analyze_api_calls()
@@ -145,6 +188,12 @@ class NetworkAnalyzer:
 
 
 def analyze_websites(websites):
+    """
+    Analyze a list of websites using the NetworkAnalyzer class.
+
+    :param websites: A list of website URLs to analyze
+    :return: A dictionary containing the analysis results for each website
+    """
     results = {}
     for url in websites:
         try:
