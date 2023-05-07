@@ -19,7 +19,10 @@ def scroll(driver, max_scroll_cycles=10, max_allowed_time=60, sleep_time=3):
     start_time = time.time()
     scroll_cycle = 0
 
-    while scroll_cycle < max_scroll_cycles and (time.time() - start_time) < max_allowed_time:
+    while (
+        scroll_cycle < max_scroll_cycles
+        and (time.time() - start_time) < max_allowed_time
+    ):
         # Scroll down to the bottom of the page
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(sleep_time)
@@ -59,7 +62,8 @@ def monitor_requests(driver):
 
     :param driver: The WebDriver instance controlling the browser
     """
-    driver.execute_script("""
+    driver.execute_script(
+        """
         window.api_endpoints = new Set();
 
         (function(open, send) {
@@ -81,7 +85,8 @@ def monitor_requests(driver):
                 return fetch.apply(this, arguments);
             };
         })(window.fetch);
-    """)
+    """
+    )
 
 
 monitor_requests(driver)

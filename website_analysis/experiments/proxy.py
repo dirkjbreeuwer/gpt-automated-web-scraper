@@ -79,14 +79,17 @@ async def run_mitmproxy(mitm_options, master_ref, shutdown_event, started_event)
 
 async def main():
     """Set up mitmproxy, start Selenium WebDriver with Chrome, and capture network traffic."""
-    mitm_options = options.Options(listen_host="127.0.0.1", listen_port=8080, mode="regular")
+    mitm_options = options.Options(
+        listen_host="127.0.0.1", listen_port=8080, mode="regular"
+    )
     master_ref = []
     shutdown_event = Event()
     started_event = Event()
 
     # Start mitmproxy
-    mitmproxy_task = asyncio.create_task(run_mitmproxy(mitm_options, master_ref,
-                                                       shutdown_event, started_event))
+    mitmproxy_task = asyncio.create_task(
+        run_mitmproxy(mitm_options, master_ref, shutdown_event, started_event)
+    )
     await started_event.wait()
 
     chrome_options = Options()
@@ -115,6 +118,7 @@ async def main():
     master.shutdown()
     shutdown_event.set()
     await mitmproxy_task
+
 
 # Run the main function
 asyncio.run(main())

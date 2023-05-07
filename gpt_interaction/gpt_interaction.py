@@ -64,7 +64,7 @@ class GPTInteraction:
                 prompt=prompt,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                top_p=self.top_p
+                top_p=self.top_p,
             )
         elif self.model in self._supported_chat_models:
             response = openai.ChatCompletion.create(
@@ -72,7 +72,7 @@ class GPTInteraction:
                 messages=[{"role": "system", "content": prompt}],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                top_p=self.top_p
+                top_p=self.top_p,
             )
         else:
             raise ValueError("Unsupported model")
