@@ -1,5 +1,5 @@
 import asyncio
-import time
+from asyncio import Event
 from mitmproxy import options
 from mitmproxy.tools.dump import DumpMaster
 from selenium import webdriver
@@ -7,22 +7,35 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from mitmproxy import http
+
+
 class RequestInterceptor:
     def __init__(self):
         self.urls = []
 
-    def request(self, flow):
+    def http_connect(self, flow: http.HTTPFlow) -> None:
+        self.urls.append(flow.request.url)
+
+    def response(self, flow: http.HTTPFlow) -> None:
         self.urls.append(flow.request.url)
 
     def print_urls(self):
         for url in self.urls:
             print(url)
 
-async def run_mitmproxy(mitm_options, master_ref):
+
+async def run_mitmproxy(mitm_options, master_ref, shutdown_event, started_event):
     request_interceptor = RequestInterceptor()
     master = DumpMaster(mitm_options)
     master.addons.add(request_interceptor)
     master_ref.append(master)
+
+    async def set_started():
+        await asyncio.sleep(0.5)
+        started_event.set()
+
+    asyncio.create_task(set_started())
 
     try:
         await master.run()
@@ -31,15 +44,19 @@ async def run_mitmproxy(mitm_options, master_ref):
     finally:
         master.shutdown()
 
+    await shutdown_event.wait()
     request_interceptor.print_urls()
 
+
 async def main():
-    mitm_options = options.Options(listen_host="127.0.0.1", listen_port=8080, mode="transparent")
+    mitm_options = options.Options(listen_host="127.0.0.1", listen_port=8080, mode="regular")
     master_ref = []
+    shutdown_event = Event()
+    started_event = Event()
 
     # Start mitmproxy
-    asyncio.create_task(run_mitmproxy(mitm_options, master_ref))
-    await asyncio.sleep(5)  # Give mitmproxy some time to start
+    mitmproxy_task = asyncio.create_task(run_mitmproxy(mitm_options, master_ref, shutdown_event, started_event))
+    await started_event.wait()
 
     chrome_options = Options()
     chrome_options.add_argument("--disable-infobars")
@@ -54,14 +71,10 @@ async def main():
     service = Service(executable_path=ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
-    # ...
-    
     url = "https://www.reddit.com/"
     print("Starting request capture...")
     driver.get(url)
     print("Finished request capture.")
-    # ...
-
 
     driver.implicitly_wait(10)
     driver.quit()
@@ -69,6 +82,9 @@ async def main():
     # Stop mitmproxy
     master = master_ref[0]
     master.shutdown()
+    shutdown_event.set()
+    await mitmproxy_task
+
 
 # Run the main function
 asyncio.run(main())

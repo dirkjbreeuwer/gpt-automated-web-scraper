@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-import time
 
 def scroll(driver, max_scroll_cycles=10, max_allowed_time=60, sleep_time=3):
     start_time = time.time()
@@ -27,6 +26,7 @@ def scroll(driver, max_scroll_cycles=10, max_allowed_time=60, sleep_time=3):
 
         scroll_cycle += 1
 
+
 chrome_options = Options()
 chrome_options.add_argument("--disable-infobars")
 chrome_options.add_argument("--start-maximized")
@@ -41,6 +41,7 @@ service = Service(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 driver.get("https://ra.co/events/uk/london?page=2")
+
 
 def monitor_requests(driver):
     driver.execute_script("""
@@ -66,7 +67,6 @@ def monitor_requests(driver):
             };
         })(window.fetch);
     """)
-
 
 
 monitor_requests(driver)

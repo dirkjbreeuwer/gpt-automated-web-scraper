@@ -10,6 +10,7 @@ def load_config():
         config_data = json.load(config_file)
     return config_data
 
+
 config = load_config()
 gpt4_api_key = config["gpt4"]["api_key"]
 
@@ -49,7 +50,7 @@ class NetworkAnalyzer:
             # Extract network traffic logs
             logs = browser.get_log('performance')
 
-            # Save the longs to a text file
+            # Save logs to a text file
             with open('logs.txt', 'w') as f:
                 f.write(str(logs))
 
@@ -65,9 +66,6 @@ class NetworkAnalyzer:
         # Ensure that captured traffic is not empty
         if not self.captured_traffic:
             raise Exception("Network traffic capturing failed.")
-
-
-
 
     def identify_api_calls(self):
         identified_api_calls = []
@@ -104,7 +102,6 @@ class NetworkAnalyzer:
         content_type = request["response"]["headers"].get("Content-Type", "").lower()
         return "json" in content_type or "xml" in content_type
 
-
     def analyze_api_calls(self):
         # Prepare the API calls data for input to GPT-3
         api_calls_data = json.dumps(self.api_calls, indent=2)
@@ -116,8 +113,6 @@ class NetworkAnalyzer:
             f"Can you parse the websites XML and JSON results into the following format: \n\n"
             f"| URL | Referer | Method | Purpose |\n"
         )
-
-        #print(prompt)
 
         # Call the GPT-3 API
         response = openai.Completion.create(
@@ -134,7 +129,6 @@ class NetworkAnalyzer:
 
         return api_analysis_results
 
-
     def filter_api_calls(self):
         # Placeholder for filtering API calls based on user requirements
         pass
@@ -142,14 +136,12 @@ class NetworkAnalyzer:
     def get_analysis_results(self):
         # Call analyze_api_calls and return the results
         return self.analyze_api_calls()
-    
+
     def analyze_website(self):
         self.capture_network_traffic()
         self.identify_api_calls()
         api_analysis_results = self.analyze_api_calls()
         return api_analysis_results
-
-
 
 
 def analyze_websites(websites):

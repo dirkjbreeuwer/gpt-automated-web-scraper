@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class GPTInteraction:
     _supported_chat_models = [
         "gpt-4",
