@@ -35,7 +35,6 @@ outcome==1.2.0
 packaging==23.1
 pandas==2.0.1
 passlib==1.7.4
-pkg_resources==0.0.0
 protobuf==3.19.6
 publicsuffix2==2.20191221
 pyasn1==0.5.0
