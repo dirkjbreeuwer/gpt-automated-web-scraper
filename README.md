@@ -2,7 +2,7 @@
 
 ![GPT based automated webscrapper](https://cdn.discordapp.com/attachments/984632500875821066/1104363425439698944/analyticsynthetic_Small_cute_mining_robot_with_large_eyes_5501ffb9-ea08-4dfc-b04d-9623f7c4481a.png "GPT based automated webscrapper")
 
-The GPT-based Universal Web Scraper is an MVP project that aims to provide a web scraping solution using GPT models to interact with users and generate scraper code based on user requirements, website structure analysis, and network traffic analysis. The purpose of this project is to simplify the process of web scraping by leveraging the capabilities of GPT models and various web scraping libraries.
+This GPT-based Universal Web Scraper is a project that allows users to automate web scraping effortlessly by leveraging GPT models to analyze website structures, user requirements, and network traffic, streamlining the data extraction process.
 
 **Note**: The GPT prompt for analyzing API calls is still in progress and may not return accurate results at this time. We are working on improving the prompt to provide better analysis results.
 
