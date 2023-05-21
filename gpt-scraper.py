@@ -5,8 +5,6 @@ import argparse
 from website_analysis.dom_analysis import HtmlLoader, UrlHtmlLoader
 from scraper_generation.scraper_generator import ScrapingCodeGenerator, CodeWriter
 from data_extraction.data_extractor import CodeExecutor 
-from user_requirements_gathering import UserRequirementGatherer
-
 
 
 def main():
@@ -20,7 +18,7 @@ def main():
     source_type = args.source_type
     USER_REQUIREMENTS = args.requirements
 
-    # create HtmlLoader or UrlHtmlLoader based on the source type
+    # Create HtmlLoader or UrlHtmlLoader based on the source type
     def create_html_loader(source, source_type):
         if source_type == 'url':
             return UrlHtmlLoader(source)
@@ -30,7 +28,7 @@ def main():
     html_loader = create_html_loader(source, source_type)
 
     # Instantiate ScrapingCodeGenerator with the html_loader
-    code_generator = ScrapingCodeGenerator(html_loader)
+    code_generator = ScrapingCodeGenerator(html_loader, source=source, source_type=source_type)
 
     # Generate scraping code
     scraping_code = code_generator.generate_scraping_code(USER_REQUIREMENTS)
@@ -49,10 +47,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
 
 
 # python3 gpt-scraper.py --source-type "file" --source "./results/denver.html" --requirements "Extract the average monthly temperature in denver"
