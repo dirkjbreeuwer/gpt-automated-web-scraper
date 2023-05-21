@@ -1,4 +1,5 @@
 # AI Web Scraper
+![GPT based automated webscrapper](https://cdn.discordapp.com/attachments/984632500875821066/1104363425439698944/analyticsynthetic_Small_cute_mining_robot_with_large_eyes_5501ffb9-ea08-4dfc-b04d-9623f7c4481a.png "GPT based automated webscrapper")
 
 This project is an AI-powered web scraper that allows you to extract information from HTML sources based on user-defined requirements. It generates scraping code and executes it to retrieve the desired data.
 
@@ -30,7 +31,7 @@ Before running the AI Web Scraper, ensure you have the following prerequisites i
    pip install -r requirements.txt
    ```
 
-4. Set up the OpenAI GPT-3 API key:
+4. Set up the OpenAI GPT-4 API key:
    
    - Obtain an API key from OpenAI by following their documentation.
    - Rename the file called `.env.example` to `.env` in the project directory.
