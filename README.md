@@ -1,93 +1,70 @@
-# GPT-based Automated Web Scraper
+# AI Web Scraper
 
-![GPT based automated webscrapper](https://cdn.discordapp.com/attachments/984632500875821066/1104363425439698944/analyticsynthetic_Small_cute_mining_robot_with_large_eyes_5501ffb9-ea08-4dfc-b04d-9623f7c4481a.png "GPT based automated webscrapper")
+This project is an AI-powered web scraper that allows you to extract information from HTML sources based on user-defined requirements. It generates scraping code and executes it to retrieve the desired data.
 
-This GPT-based Universal Web Scraper is a project that allows users to automate web scraping effortlessly by leveraging GPT models to analyze website structures, user requirements, and network traffic, streamlining the data extraction process.
+## Prerequisites
 
-**Note**: The GPT prompt for analyzing API calls is still in progress and may not return accurate results at this time. We are working on improving the prompt to provide better analysis results.
+Before running the AI Web Scraper, ensure you have the following prerequisites installed:
 
-## Documentation
-
-Detailed information about the project can be found in the following documents:
-
-- [Technical Design Document (TDD)](tdd.md): The TDD provides a comprehensive overview of the system architecture, component design, and implementation details.
-- [Product Requirements Document (PRD)](prd.md): The PRD outlines the features, functionality, and requirements of the GPT-based Universal Web Scraper.
-
-## Main Components
-
-1. `gpt_interaction`: Handles communication with the GPT model and manages user interaction to gather scraping requirements.
-2. `scraper_generation`: Generates scraper code based on the results of the website structure analysis and user requirements.
-3. `url_preprocessing`: Handles URL validation, normalization, and cleaning tasks.
-4. `website_analysis`: Analyzes website DOM, identifies relevant elements, and detects APIs through network traffic analysis for data extraction.
-5. `data_extraction`: Executes the generated scraper and extracts data from the target website.
+- Python 3.x
+- The required Python packages specified in the `requirements.txt` file
+- An API key for the OpenAI GPT-4
 
 ## Installation
 
-To install the project dependencies, run the following command:
+1. Clone the project repository:
 
-```
-pip install -r requirements.txt
-```
+   ```shell
+   git clone https://github.com/dirkjbreeuwer/gpt-automated-web-scraper
+   ```
 
-Next, copy the `config.json.example` file to `config.json` and enter your GPT-4 API key in the `gpt4` section:
+2. Navigate to the project directory:
 
-```json
-{
-  "gpt4": {
-    "api_key": "your-api-key-here"
-  }
-}
-```
+   ```shell
+   cd gpt-automated-web-scraper
+   ```
+
+3. Install the required Python packages:
+
+   ```shell
+   pip install -r requirements.txt
+   ```
+
+4. Set up the OpenAI GPT-3 API key:
+   
+   - Obtain an API key from OpenAI by following their documentation.
+   - Rename the file called `.env.example` to `.env` in the project directory.
+   - Add the following line to the `.env` file, replacing `YOUR_API_KEY` with your actual API key:
+
+     ```plaintext
+     OPENAI_API_KEY=YOUR_API_KEY
+     ```
 
 ## Usage
 
-You can analyze the network traffic of websites using the NetworkAnalyzer class provided in the `./website_analysis/network_analysis.py` file. Here's an example of how to use the class:
+To use the AI Web Scraper, run the `gpt-scraper.py` script with the desired command-line arguments.
 
-```python
+### Command-line Arguments
 
-from website_analysis.network_analysis import NetworkAnalyzer
+The following command-line arguments are available:
 
-# URL of the website to analyze
-url = "https://www.example.com"
+- `--source`: The URL or local path to the HTML source to scrape.
+- `--source-type`: Type of the source. Specify either `"url"` or `"file"`.
+- `--requirements`: User-defined requirements for scraping.
+- `--target-string`:  Due to the maximum token limit of GPT-4 (4k tokens), the AI model processes a smaller subset of the HTML where the desired data is located. The target string should be an example string that can be found within the website you want to scrape. 
 
-# User requirements for the data extraction (currently not used)
-user_requirements = {}
+### Example Usage
 
-# Create a NetworkAnalyzer instance
-analyzer = NetworkAnalyzer(url, user_requirements)
+Here are some example commands for using the AI Web Scraper:
 
-# Analyze the website
-analysis_results = analyzer.analyze_website()
-
-# Print the analysis results
-print(analysis_results)
+```shell
+python3 gpt-scraper.py --source-type "url" --source "https://www.scrapethissite.com/pages/forms/" --requirements "Print a JSON file with all the information available for the Chicago Blackhawks" --target-string "Chicago Blackhawks"
 ```
 
-You can also analyze multiple websites at once using the `analyze_websites` function provided in the same file. Just pass a list of website URLs as an argument:
-
-```python
-
-from website_analysis.network_analysis import analyze_websites
-
-# List of website URLs to analyze
-websites = [
-    "https://www.example1.com",
-    "https://www.example2.com",
-    "https://www.example3.com"
-]
-
-# Analyze the websites
-results = analyze_websites(websites)
-
-# Print the analysis results
-print(results)
-```
+Replace the values for `--source`, `--requirements`, and `--target-string` with your specific values.
 
 
-## Testing
+## License
 
-Currently the project is still under development. This section will be updated once the project is ready for use.
+This project is licensed under the [MIT License](LICENSE). Feel free to modify and use it according to your needs.
 
-## Contributing
-
-We welcome contributions to improve the GPT-based Universal Web Scraper. Please feel free to submit issues, feature requests, and pull requests on the repository.

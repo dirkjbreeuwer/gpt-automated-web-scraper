@@ -27,6 +27,7 @@ class UrlHtmlLoader:
         response = requests.get(self.url)
         response.raise_for_status()  # Raise an exception if the request was unsuccessful
         return response.text
+    
 
 class HTMLParser:
     def __init__(self, parser_type='html.parser'):
@@ -87,13 +88,44 @@ class HTMLProcessingPipeline:
         parent_element = self.extractor.extract(target_element, generations)
         prepared_html = self.preparer.prepare(parent_element)
         return prepared_html
+    
+
+class HtmlManager:
+    def __init__(self, source, source_type, target_string, max_length=4000):
+        self.max_length = max_length
+        self.target_string = target_string
+        if source_type == 'url':
+            self.loader = UrlHtmlLoader(source)
+        else:  # source_type == 'file'
+            self.loader = HtmlLoader(source)
+        
+    def process_html(self):
+        html = self.loader.load()
+
+        if len(html) >= self.max_length:
+            # Create instances of each class
+            parser = HTMLParser()
+            searcher = HTMLSearcher()
+            extractor = ParentExtractor()
+            preparer = HTMLPreparer()
+
+            # Create an instance of the pipeline using the instances of the classes
+            pipeline = HTMLProcessingPipeline(parser, searcher, extractor, preparer)
+
+            # Call the `process` method of the pipeline with the necessary parameters
+            target_string = self.target_string
+            generations = 3
+            processed_html = pipeline.process(html, target_string, generations)
+        else:
+            processed_html = html
+            
+
+        return processed_html 
 
 
 def main():
     # Choose a loader
-    loader = UrlHtmlLoader('https://www.scrapethissite.com/pages/simple/')
-    # Or use the URL loader
-    #loader = HtmlLoader('./path/to/your/file.html')
+    manager = HtmlManager('https://www.scrapethissite.com/pages/simple/', source_type='url')
 
     # Create instances of each class
     parser = HTMLParser()
@@ -105,7 +137,7 @@ def main():
     pipeline = HTMLProcessingPipeline(parser, searcher, extractor, preparer)
 
     # Call the `process` method of the pipeline with the necessary parameters
-    html = loader.load() # the HTML you want to process
+    html = manager.process_html() # the HTML you want to process
     target_string = "Andorra"
     generations = 2
     prepared_html = pipeline.process(html, target_string, generations)

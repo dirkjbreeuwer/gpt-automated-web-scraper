@@ -1,9 +1,16 @@
 from dotenv import load_dotenv
 from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from langchain import PromptTemplate
 
 class ScrapingCodeGenerator:
-    MODEL_NAME = "text-davinci-003"
+    MODEL_NAME = "gpt-4" # "text-davinci-003"
+    SYSTEM_MESSAGE = """
+You are an expert website analyzer for a web scraping process.
+Take the user requirements and convert it into clean python code to scrape the website.
+Don't explain the code, just generate the code block itself.
+    """
     SCRAPING_CODE = f"""
 from bs4 import BeautifulSoup
 from website_analysis.dom_analysis import HtmlLoader, UrlHtmlLoader
@@ -23,6 +30,7 @@ html_soup = BeautifulSoup(response, 'html.parser')
     PROMPT_TEMPLATE = """
 You are an expert website analyzer for a web scraping process.
 Take the user requirements and convert it into clean python code to scrape the website.
+Don't explain the code, just generate the code block itself.
 
 USER REQUIREMENTS:
 {requirements}
@@ -43,33 +51,39 @@ html_soup = BeautifulSoup(response, 'html.parser')
     
 
 
-    def __init__(self, html_loader, source, source_type):
-        self.html_loader = html_loader
+    def __init__(self, processed_html, source, source_type):
+        self.processed_html = processed_html
         self.llm = self.initialize_llm()
         self.prompt_template = self.initialize_template()
         self.scraping_code = self.SCRAPING_CODE.format(source=source, source_type=source_type)
 
     def initialize_llm(self):
         load_dotenv()
-        return OpenAI(model_name=self.MODEL_NAME, temperature=0)
+        return ChatOpenAI(model_name=self.MODEL_NAME, temperature=0.5)
 
     def initialize_template(self):
         return PromptTemplate(input_variables=["requirements","html"], template=self.PROMPT_TEMPLATE)
-
 
     def generate_scraping_code(self, user_requirements):
         """
         Returns the LLM response based on the prompt, requirements and html
         """
-        html_code = self.html_loader.load()
-        formatted_prompt = self.prompt_template.format(requirements=user_requirements, html=html_code)
-        generated_code = self.llm(formatted_prompt)
+        formatted_prompt = self.prompt_template.format(requirements=user_requirements, html=self.processed_html)
+        messages = [
+            SystemMessage(content=self.SYSTEM_MESSAGE),
+            HumanMessage(content=formatted_prompt)
+        ]
+        response = self.llm(messages)
+        generated_code = response.content
 
         full_scraping_code = f"""
 {self.scraping_code}
 {generated_code}
         """
+        #print(full_scraping_code)
         return full_scraping_code
+
+        
 
 class CodeWriter:
     def __init__(self, file_name):
