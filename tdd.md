@@ -23,13 +23,6 @@ Components will communicate with each other using internal APIs and direct conne
 
 The MVP will be deployed on-premises to reduce the cost associated with cloud resources and allow for better control over the infrastructure. As the product evolves and gains traction, it can be transitioned to a cloud platform to take advantage of the scalability and managed services it offers.
 
-### 1.4. Scalability and Performance
-
-The architecture is designed to handle a moderate load and a limited number of websites and users, considering the on-premises deployment and resource constraints. Scalability and performance can be optimized further as the product evolves and moves to a more distributed architecture in the future.
-
-### 1.5. Fault Tolerance and Redundancy
-
-The system will have a moderate level of fault tolerance and redundancy. While it is essential to ensure that the system is resilient to failures and unexpected conditions, the level of fault tolerance and redundancy can be moderate, considering the limited resources and on-premises deployment. As the product matures and moves to a more distributed architecture, fault tolerance and redundancy can be improved to better handle failures and ensure high availability.
 
 ## 2. Component Design
 
